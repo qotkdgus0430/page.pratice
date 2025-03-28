@@ -1,75 +1,31 @@
-class StickyNavigation {
-	
-	constructor() {
-		this.currentId = null;
-		this.currentTab = null;
-		this.tabContainerHeight = 70;
-		let self = this;
-		$('.et-hero-tab').click(function() { 
-			self.onTabClick(event, $(this)); 
-		});
-		$(window).scroll(() => { this.onScroll(); });
-		$(window).resize(() => { this.onResize(); });
-	}
-	
-	onTabClick(event, element) {
-		event.preventDefault();
-		let scrollTop = $(element.attr('href')).offset().top - this.tabContainerHeight + 1;
-		$('html, body').animate({ scrollTop: scrollTop }, 600);
-	}
-	
-	onScroll() {
-		this.checkTabContainerPosition();
-    this.findCurrentTabSelector();
-	}
-	
-	onResize() {
-		if(this.currentId) {
-			this.setSliderCss();
-		}
-	}
-	
-	checkTabContainerPosition() {
-		let offset = $('.et-hero-tabs').offset().top + $('.et-hero-tabs').height() - this.tabContainerHeight;
-		if($(window).scrollTop() > offset) {
-			$('.et-hero-tabs-container').addClass('et-hero-tabs-container--top');
-		} 
-		else {
-			$('.et-hero-tabs-container').removeClass('et-hero-tabs-container--top');
-		}
-	}
-	
-	findCurrentTabSelector(element) {
-		let newCurrentId;
-		let newCurrentTab;
-		let self = this;
-		$('.et-hero-tab').each(function() {
-			let id = $(this).attr('href');
-			let offsetTop = $(id).offset().top - self.tabContainerHeight;
-			let offsetBottom = $(id).offset().top + $(id).height() - self.tabContainerHeight;
-			if($(window).scrollTop() > offsetTop && $(window).scrollTop() < offsetBottom) {
-				newCurrentId = id;
-				newCurrentTab = $(this);
-			}
-		});
-		if(this.currentId != newCurrentId || this.currentId === null) {
-			this.currentId = newCurrentId;
-			this.currentTab = newCurrentTab;
-			this.setSliderCss();
-		}
-	}
-	
-	setSliderCss() {
-		let width = 0;
-		let left = 0;
-		if(this.currentTab) {
-			width = this.currentTab.css('width');
-			left = this.currentTab.offset().left;
-		}
-		$('.et-hero-tab-slider').css('width', width);
-		$('.et-hero-tab-slider').css('left', left);
-	}
-	
+let currentPage = 0; // 현재 페이지 인덱스
+const pages = document.querySelectorAll('.page'); // 모든 페이지 요소를 가져옵니다.
+
+// 스크롤 이벤트 처리
+window.addEventListener('wheel', (event) => {
+    if (event.deltaY > 0) {
+        // 아래로 스크롤
+        if (currentPage < pages.length - 1) {
+            currentPage++;
+        }
+    } else {
+        // 위로 스크롤
+        if (currentPage > 0) {
+            currentPage--;
+        }
+    }
+
+    // 페이지 전환
+    scrollToPage(currentPage);
+});
+
+// 페이지 전환 함수
+function scrollToPage(pageIndex) {
+    window.scrollTo({
+        top: pages[pageIndex].offsetTop,
+        behavior: 'smooth' // 부드러운 스크롤
+    });
 }
 
-new StickyNavigation();
+// 첫 번째 페이지로 이동
+scrollToPage(currentPage);
